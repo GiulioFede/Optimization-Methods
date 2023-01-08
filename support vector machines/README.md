@@ -3,4 +3,5 @@ We assume that the data are linearly separable, i.e. that the convex hull of the
 <br />
 ![linear svm](images/linear_svm.PNG)
 we can also highlight the support vectors:
+<br />
 ![linear svm with support vectors hightlighted](images/linear_svm_support_vectors.PNG)
