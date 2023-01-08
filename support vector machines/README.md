@@ -1,4 +1,6 @@
 # Linear SVM
-We assume that the data are linearly separable, i.e. that the convex hull of the two sets (binary problem) have no intersection between them.
+We assume that the data are linearly separable, i.e. that the convex hull of the two sets (binary problem) have no intersection between them:
 <br />
-![This is an image](images/linear_svm.PNG)
+![linear svm](images/linear_svm.PNG)
+we can also highlight the support vectors:
+![linear svm with support vectors hightlighted](images/linear_svm_support_vectors.PNG)
