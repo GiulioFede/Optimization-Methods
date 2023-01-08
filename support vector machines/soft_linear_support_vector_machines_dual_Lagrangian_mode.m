@@ -150,7 +150,7 @@ w1 = sum(solution.*y.*T(:,1));
 w2 = sum(solution.*y.*T(:,2));
 
 %calcolo b
-%prendo il primo indice dove lambda è >0 ma (NUOVO) anche <C
+%prendo il primo indice dove lambda è >0 ma (NUOVO) anche <C  <---------- NEW NEW NEW NEW
 index = find(solution > 0.001 & solution < C-1e-3);
 index = index(1);
 %prendo il relativo label e punto
