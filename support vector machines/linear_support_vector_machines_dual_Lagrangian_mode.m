@@ -163,4 +163,11 @@ end_y = (-w1*end_x-b)/w2;
 hold on
 plot([start_x end_x], [start_y  end_y],'k-')
 
+%evidenzio i punti del dataset che sono vettori di supporto
+index = find(solution > 0.001);
+support_vectors = T(index,:);
+
+hold on
+scatter(support_vectors(:,1), support_vectors(:,2),100,'d');
+
 
