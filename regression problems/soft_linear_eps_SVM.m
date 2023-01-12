@@ -1,11 +1,15 @@
 
 %{
-    Utilizzeremo un eps-SVM per trovare l'hyperpiano (quindi predittore
+    Utilizzeremo una soft eps-SVM per trovare l'hyperpiano (quindi predittore
     lineare) che meglio predica i dati cercando di rispettare due
     condizioni tipiche dell'eps-SVM:
         1) massimo errore pari a eps=0.5
         2) predittore quanto più flat possibile per questione di
         generalizzazione.
+
+    La differenza con la eps-SVM è che utilizziamo delle slack variable per
+    permettere al sistema di trovare una soluzione anche quando eps è
+    troppo piccolo
 %}
 
 dataset = [
@@ -43,12 +47,33 @@ x = dataset(:,1);
 %ground truth
 y= dataset(:,2);
 
-%fisso l'epsilon
-eps = 0.5;
+%fisso l'epsilon e lo metto davvero piccolo
+eps = 0.2;
+
+C = 10;
 
 % la quadprog vuole come funzione obiettivo 1/2 x^T H x + f^Tx
-H = [1 0; 0 0];
-f = zeros(2,1);
+H = [1 0 zeros(1,2*l); 0 0 zeros(1,2*l); zeros(2*l,2*l+2)];
+f = [zeros(2,1); C*ones(2*l,1)];
 
+I = eye(l);
 %i vincoli desiderati sono A x <= b
-A = [-x -ones(l+1,1)]
+A = [-x -ones(l,1) -I zeros(l); x ones(l,1) zeros(l) -I ];
+b = [-y+eps; y+eps];
+
+%lower bound
+lb = [-inf, -inf, zeros(1,2*l)];
+
+%risolvo. La soluzione è il vettore z=(w,b)
+z = quadprog(H,f,A,b,[],[],lb,[]);
+w = z(1);
+b = z(2);
+
+%plotto. 
+start_p = min(x)-5;
+end_p = max(x)+5;
+y_start = w*start_p + b;
+y_end = w*end_p + b;
+
+hold on
+plot([start_p, end_p], [y_start, y_end],'color','r');
