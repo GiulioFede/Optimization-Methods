@@ -10,3 +10,9 @@ We have choosen eps=0.5 for the eps-SVM implementation.
 ![linear eps-SVM regression](images/linear_eps_SVM.PNG)
 <br />
 
+# Soft Linear eps-SVM Regression
+We have choosen eps=0.2, C=10 for the soft-eps-SVM implementation.
+<br />
+![soft eps-SVM regression](images/soft_linear_eps_SVM.PNG)
+<br />
+
