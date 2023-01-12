@@ -8,7 +8,13 @@ we can also highlight the support vectors:
 ![linear svm with support vectors hightlighted](images/linear_svm_support_vectors.PNG)
 
 # Soft Linear SVM
-We assume that the data are not linearly separable.
+We assume that the data are not perfectly linearly separable.
 <br />
 ![soft linear svm](images/soft_linear_svm.PNG)
+<br />
+
+# Non Linear SVM 
+We assume that the data are not linearly separable. I used gaussian kernel:
+<br />
+![non linear svm](images/non_linear_svm.PNG)
 <br />
