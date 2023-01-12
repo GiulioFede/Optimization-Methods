@@ -1,10 +1,10 @@
 
 %{
-    Questo algoritmo prevede lo stesso obiettivo fatto nell'omonimo,
-    ma stavolta risolvendo il più semplice problema Lagrangiano duale.
-
-    Inoltre il dataset contiene dati NON linearmente separabili.
-    Utilizzando il duale Lagrangiano c'è poco da modificare. 
+    Stavolta i dati non sono linearmente separabili.
+    
+    Risolveremo il duale Lagrangiano per ottenere le soluzioni (lambda) con le quali
+    costruire l'hyperplane nel feature space. Useremo come kernel quello gaussiano con 
+    gamma=1 per ottenere una superfice più smussata ed evitare l'overfitting.
 
 %}
 
