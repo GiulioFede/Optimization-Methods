@@ -1,5 +1,9 @@
 %{
 
+    Risolveremo il problema di regressione utilizzando un polinomio di 
+    grado 3.
+    Inoltre lo risolveremo nei 3 casi in cui si utilizzi la norma 1, 2 e la
+    infinity.
 
 %}
 

@@ -1,5 +1,8 @@
 %{
 
+    Risolveremo il problema di regressione utilizzando un polinomio di 
+    grado 3.
+    Inoltre lo risolveremo nei 3 casi in cui si utilizzi 
 
 %}
 
@@ -119,7 +122,7 @@ plot(points, predictions,'color','r');
                         [ -A -I ] [u]       [-y]
 %}
 
-f = [ones(l,1); zeros(4,1)];
+f = [zeros(4,1);ones(l,1)];
 
 I = eye(l);
 M = [ [A; -A], [-I; -I]];
@@ -139,13 +142,13 @@ plot(points, predictions,'color','b');
 
 
 
-%---------------------------- Norma 2 ------------------------------------
+%---------------------------- Norma infinity ------------------------------------
 %{
     Stessa cosa della norma 1, solo che qui abbiamo solo una u, vedila come
     una u con una sola componente
 %}
 
-f = [1; zeros(4,1)];
+f = [zeros(4,1); 1];
 
 M = [ [A; -A], -ones(2*l,1)];
 
@@ -160,7 +163,7 @@ z = sol(1:4);
 predictions = arrayfun(@(p) (z(1) + z(2)*p + z(3)*p^2 + z(4)*p^3), points);
 
 hold on
-plot(points, predictions,'color','y');
+plot(points, predictions,'color','g');
 
 
 
