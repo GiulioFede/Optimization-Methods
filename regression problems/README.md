@@ -16,3 +16,9 @@ We have choosen eps=0.2, C=10 for the soft-eps-SVM implementation.
 ![soft eps-SVM regression](images/soft_linear_eps_SVM.PNG)
 <br />
 
+# Soft Linear eps-SVM Regression with Lagrangian duality
+We have choosen eps=0.2, C=10 for the soft-eps-SVM implementation and we highlighted the support vectors in green:
+<br />
+![soft eps-SVM regression with Lagrangian duality](images/soft_linear_eps_SVM_with_Lagrangian_dual.PNG)
+<br />
+
