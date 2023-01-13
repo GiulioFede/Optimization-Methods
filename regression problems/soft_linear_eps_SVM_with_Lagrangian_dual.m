@@ -69,7 +69,7 @@ for row=1:l
 end
 Q = [M  -M;  -M  M];
 
-c = [-1*ones(l,1)*eps+y; ones(l,1)*eps-y];
+c = [-1*ones(l,1)*eps+y; -ones(l,1)*eps-y];
 
 
 %abbiamo un solo vincolo di uguaglianza --> Aeq*l=beq
@@ -111,10 +111,10 @@ y_end = w*end_p + b;
 hold on
 plot([start_p, end_p], [y_start, y_end],'color','r');
 
-%evidenzio i support vector. Sono quelli con i lambda relativi positivi
+%evidenzio i support vector. Sono quelli con uno dei due lambda relativi positivi
 index_lambda_pos = find(lambda(1:l)>1e-3);
 index_lambda_neg = find(lambda(l+1:end)>1e-3);
-%prendo solo gli indici in comune
-common = intersect(index_lambda_pos, index_lambda_neg);
+%prendo l'unione
+common = union(index_lambda_pos, index_lambda_neg);
 
 scatter(x(common), y(common), 'green');
