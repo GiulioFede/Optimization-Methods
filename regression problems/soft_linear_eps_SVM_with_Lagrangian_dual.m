@@ -69,6 +69,7 @@ for row=1:l
 end
 Q = [M  -M;  -M  M];
 
+%c = [-1*ones(l,1)*eps+y; ones(l,1)*eps-y];
 c = [-1*ones(l,1)*eps+y; -ones(l,1)*eps-y];
 
 
@@ -91,7 +92,7 @@ w = sum( (lambda(1:l)-lambda(l+1:end)).*x);
 %trovo quel lambda (positivo) che sia compreso tra 0 e C (entrambi esclusi)
 index = find(lambda(1:l)>=0.001 & lambda(1:l)<C-1e-3);
 %se non è vuoto...
-if length(index)==0
+if length(index)>0
     index = index(1);
     b = y(index)-w*x(index)-eps;
 %...altrimenti utilizzo i lambda negativi

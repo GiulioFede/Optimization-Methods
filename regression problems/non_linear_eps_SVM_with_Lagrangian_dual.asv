@@ -1,0 +1,173 @@
+
+%{
+    Utilizzeremo una soft eps-SVM per trovare l'hyperpiano (quindi predittore
+    lineare) che meglio predica i dati cercando di rispettare due
+    condizioni tipiche dell'eps-SVM:
+        1) massimo errore pari a eps=0.5
+        2) predittore quanto più flat possibile per questione di
+        generalizzazione.
+
+    La differenza con la eps-SVM è che utilizziamo delle slack variable per
+    permettere al sistema di trovare una soluzione anche quando eps è
+    troppo piccolo.
+
+    Qui i dati sono per non linearmente separabili e quindi utilizzeremo il
+    kernel.
+%}
+
+dataset = [-5.0000  -96.2607 
+   -4.8000  -85.9893
+   -4.6000  -55.2451
+   -4.4000  -55.6153
+   -4.2000  -44.8827
+   -4.0000  -24.1306
+   -3.8000  -19.4970
+   -3.6000  -10.3972
+   -3.4000   -2.2633
+   -3.2000    0.2196
+   -3.0000    4.5852
+   -2.8000    7.1974
+   -2.6000    8.2207
+   -2.4000   16.0614
+   -2.2000   16.4224
+   -2.0000   17.5381
+   -1.8000   11.4895
+   -1.6000   14.1065
+   -1.4000   16.8220
+   -1.2000   16.1584
+   -1.0000   11.6846
+   -0.8000    5.9991
+   -0.6000    7.8277
+   -0.4000    2.8236
+   -0.2000    2.7129
+         0    1.1669
+    0.2000   -1.4223
+    0.4000   -3.8489
+    0.6000   -4.7101
+    0.8000   -8.1538
+    1.0000   -7.3364
+    1.2000  -13.6464
+    1.4000  -15.2607
+    1.6000  -14.8747
+    1.8000   -9.9271
+    2.0000  -10.5022
+    2.2000   -7.7297
+    2.4000  -11.7859
+    2.6000  -10.2662
+    2.8000   -7.1364
+    3.0000   -2.1166
+    3.2000    1.9428
+    3.4000    4.0905
+    3.6000   16.3151
+    3.8000   16.9854
+    4.0000   17.6418
+    4.2000   46.3117
+    4.4000   53.2609
+    4.6000   72.3538
+    4.8000   49.9166
+    5.0000   89.1652];
+
+%plotto i punti
+scatter(dataset(:,1), dataset(:,2), 'black');
+
+%dimensione del dataset
+l = size(dataset,1);
+
+%osservazioni
+x = dataset(:,1);
+
+%ground truth
+y= dataset(:,2);
+
+%fisso l'epsilon e lo metto davvero piccolo
+eps = 0.2;
+
+C = 10;
+
+%{
+    la quadprog vuole come funzione obiettivo 1/2 l^T H l + c^T l
+    Ricordo che: 
+                Q= [ M    -M
+                    -M     M ]
+
+    mentre:
+                c = [(-eps+y_1),...,(eps-y_l)]
+%}
+M = zeros(l,l);
+for row=1:l
+    for column=1:l
+        M(row,column) = gaussian_kernel(x(row),x(column));   %<---------- NEW NEW NEW
+    end
+end
+Q = [M  -M;  -M  M];
+
+%c = [-1*ones(l,1)*eps+y; ones(l,1)*eps-y];
+c = [-1*ones(l,1)*eps+y; -ones(l,1)*eps-y];
+
+%abbiamo un solo vincolo di uguaglianza --> Aeq*l=beq
+Aeq= [ones(1,l)  -1*ones(1,l)];
+beq = 0;
+
+%lower bound
+lb = zeros(2*l,1);
+up = C*ones(2*l,1);
+
+%risolvo. La soluzione sono i vettori lambda (2*l) positivi e negativi
+%ricorda di cambiare il segno della funzione obiettivo in quanto il
+%problema duale è espresso come "max".
+lambda = quadprog(Q,-c,[],[],Aeq,beq,lb,up);
+
+
+
+
+%trovo quel lambda (positivo) che sia compreso tra 0 e C (entrambi esclusi)
+index = find(lambda(1:l)>=0.001 & lambda(1:l)<C-1e-3);
+%se non è vuoto...
+if length(index)==0
+    index = index(1);
+    %non ho w quindi calcolo k(x_j, x_i) dove x_i è fisso
+    k_values = arrayfun(@(index_j) gaussian_kernel(x(index_j), x(index)), 1:l);
+    b = y(index)-(sum( (lambda(1:l)-lambda(l+1:end)).*k_values'))-eps;
+%...altrimenti utilizzo i lambda negativi
+else
+    index = find(lambda(l+1:end)>=0.001 & lambda(l+1:end)<C-1e-3);
+    index = index(1);
+    %non ho w quindi calcolo k(x_j, x_i) dove x_i è fisso
+    k_values = arrayfun(@(index_j) gaussian_kernel(x(index_j), x(index)), 1:l);
+    b = y(index)-(sum( (lambda(l+1,end)-lambda(l+1:end)).*k_values'))-eps;
+end
+
+
+%plotto. 
+start_p = min(x);
+end_p = max(x);
+points = start_p:0.1:end_p;
+y_points = zeros(length(points),1);
+
+for p=1:length(points)
+    
+    %calcolo la predizione sul punto
+    k_values = arrayfun(@(index_j) gaussian_kernel(x(index_j), points(p)), 1:l);
+    %predico y
+    y_points(p) = (sum( (lambda(1:l)-lambda(l+1:end)).*k_values')) + b;
+end
+
+
+hold on
+scatter([points], [y_points],'color','r');
+
+%evidenzio i support vector. Sono quelli con uno dei due lambda relativi positivi
+index_lambda_pos = find(lambda(1:l)>1e-3);
+index_lambda_neg = find(lambda(l+1:end)>1e-3);
+%prendo l'unione
+common = union(index_lambda_pos, index_lambda_neg);
+
+scatter(x(common), y(common), 'green');
+
+
+
+function k = gaussian_kernel(x1, x2)
+    gamma = 1;
+    k = exp(-gamma*norm(x1-x2)^2);
+
+end
