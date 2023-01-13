@@ -225,6 +225,6 @@ end
 
 function k = polynomial_kernel(x1, x2)
     p = 4;
-    k = (x1*x2+1)^p;
+    k = (x1'*x2+1)^p;
 
 end
