@@ -91,7 +91,7 @@ for i=1:l
         %calcolo la distanza tra pi e il centroide cj
         centroid = centroids(j,:);
 
-        dist = norm(pattern_i-centroid);
+        dist = norm(pattern_i-centroid,1); %<---- Qui la norma è 1
 
         if min_dist == -1 || min_dist > dist
 
@@ -148,8 +148,12 @@ while true
             numerator = numerator + dataset(index_patterns_cluster_j(i),:);
         
         end
-        %aggiorno le componenti del centroide corrente
-        centroids(j,:) = numerator / size(index_patterns_cluster_j,1);
+        %aggiorno le componenti del centroide corrente come mediana delle
+        %componenti dei patter
+        if mode(size(index_patterns_cluster_j,1),2)==0
+            %la funzione median ordina gi
+            sorted_patterns = sort()
+            centroids(j,:) = numerator / size(index_patterns_cluster_j,1);
 
     end
 

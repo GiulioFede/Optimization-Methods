@@ -91,7 +91,7 @@ for i=1:l
         %calcolo la distanza tra pi e il centroide cj
         centroid = centroids(j,:);
 
-        dist = norm(pattern_i-centroid);
+        dist = norm(pattern_i-centroid,1); %<---- Qui la norma è 1
 
         if min_dist == -1 || min_dist > dist
 
@@ -111,7 +111,7 @@ end
 
 %}
 
-%prendo i pattern associati al centroide c1
+%prendo i pattern associati ai centroidi
 index_patterns_cluster_1 = find(aij(:,1)==1);
 index_patterns_cluster_2 = find(aij(:,2)==1);
 index_patterns_cluster_3 = find(aij(:,3)==1);
@@ -128,9 +128,11 @@ scatter(c2(1), c2(2),'filled', 'green');
 scatter(c3(1), c3(2),'filled', 'blue');
 
 hold off
-
+pause(2);
 it=1;
+current_f_objective = inf;
 while true
+
     fprintf("K-MEANS: Iterazione %d ", it);
     %aggiorno le componenti di ogni cluster come baricentro dei pattern a
     %cui è stato assegnato
@@ -146,8 +148,13 @@ while true
             numerator = numerator + dataset(index_patterns_cluster_j(i),:);
         
         end
-        %aggiorno le componenti del centroide corrente
-        centroids(j,:) = numerator / size(index_patterns_cluster_j,1);
+
+        %aggiorno le componenti del centroide corrente come mediana delle
+        %componenti dei patter
+        %la funzione median ordina già di per se i punti
+        %la funzione median calcola la mediana su ogni colonna
+
+        centroids(j,:) = median(dataset(index_patterns_cluster_j,:));
 
     end
 
@@ -168,7 +175,7 @@ while true
             %calcolo la distanza tra pi e il centroide cj
             centroid = centroids(j,:);
     
-            dist = norm(pattern_i-centroid);
+            dist = norm(pattern_i-centroid,1);  %<----- Norma 1
     
             if min_dist == -1 || min_dist > dist
     
@@ -188,7 +195,7 @@ while true
     
     %}
     
-    %prendo i pattern associati al centroide c1
+    %prendo i pattern associati ai centroidi
     index_patterns_cluster_1 = find(aij(:,1)==1);
     index_patterns_cluster_2 = find(aij(:,2)==1);
     index_patterns_cluster_3 = find(aij(:,3)==1);
@@ -210,13 +217,21 @@ while true
     for i=1:l
         pattern_i = dataset(i,:);
         index_associated_centroid = find(aij(i,:)==1);
-        objective_function_value = objective_function_value + norm(dataset(i,:)-centroids(index_associated_centroid,:));
+        objective_function_value = objective_function_value + norm(dataset(i,:)-centroids(index_associated_centroid,:),1);  %<---- Norma 1
     end
 
-    fprintf("\n  valore funzione obiettivo= %s ", num2str(objective_function_value));
-    title("f(x)= %s", string)
+    fprintf("\n  valore funzione obiettivo= %s \n", num2str(objective_function_value));
+    title("f(x)= ", num2str(objective_function_value));
     pause(2)
     hold off
 
+    it = it+1;
+    if abs(objective_function_value-current_f_objective)<=1e-5
+        break
+    else
+        current_f_objective = objective_function_value;
+    end
+
 end
 
+fprintf("fine");
