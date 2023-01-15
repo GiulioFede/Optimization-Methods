@@ -9,7 +9,7 @@ gamma = 0.9;
 t_start = 1;
 
 it = 1;
-while not(isequal(gradient(x(1), x(2)),[0,0]))
+while norm(gradient(x(1), x(2)))>1e-9
 
     %risolvo il sistema lineare per trovare d
     d = -gradient(x(1),x(2))*inv(hessian(x(1),x(2)));
