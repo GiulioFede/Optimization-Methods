@@ -2,8 +2,11 @@
 
 %f(x) = 3x1^2 +3x2^2 +3x3^2 +3x4^2-4x1x3-4x2x4 + x1 - x2 +2x3 -3x4
 
+%se è a true utilizziamo il conjugate gradient method
+use_conjugate = true;
+
 % starting point
-x = [10,0,0,0];
+x = [0,0,0,0];
 
 %scrivo l'hessiana Q
 Q = [6 0 -4 0;
@@ -15,13 +18,21 @@ fprintf("Starting point %s. Valore funzione: %s \n", mat2str(x), num2str(f(x(1),
 
 it = 1;
 old_f_value = inf;
+prev_direction = -1; %utile solo per il conjugate 
 while true
 
     %calcolo vettore gradiente in x corrente
     gradient_in_x = gradient(x(1), x(2), x(3), x(4));
 
-    %prendo come direzione quella opposta
-    direction = -gradient_in_x;
+    %se uso il conjugate method
+    if use_conjugate == true && it>1
+        beta = (gradient_in_x*Q*prev_direction')/(prev_direction*Q*prev_direction');
+        direction = -gradient_in_x + beta*prev_direction;
+    else
+        %altrimenti...
+        %prendo come direzione quella opposta
+        direction = -gradient_in_x;
+    end
 
     %calcolo il migliore step size
     step = -(gradient_in_x * direction')/(direction*Q*direction');
@@ -33,12 +44,16 @@ while true
     fprintf("iteration %d with current point %s. Valore funzione: %s \n", it, mat2str(x), num2str(current_f_value));
     it = it+1;
 
+    prev_direction = direction;
+
 
     if abs(current_f_value-old_f_value)<1e-6
         break;
     else
         old_f_value = current_f_value;
     end
+
+    pause(0.3);
 end
 
 
