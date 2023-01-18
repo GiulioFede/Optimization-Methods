@@ -14,7 +14,7 @@ epsilon = 5;
 tao = 0.5;
 
 k=1;
-
+x= [0,0];
 
 while true
 
