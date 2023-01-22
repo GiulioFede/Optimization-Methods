@@ -66,7 +66,7 @@ lb = [0 0 0];
 
 %testiamo se è un Nash equilibrium
 if (constant - val1 - val2)>1e-3
-    fprintf("la gap function ha valore %s. Quindi non è un Nash equilibrium.\n",num2str(constant - val1 - val2));
+    fprintf("la regularized gap function ha valore %s. Quindi non è un Nash equilibrium.\n",num2str(constant - val1 - val2));
 else
-    fprintf("la gap function ha valore %s. Quindi è un Nash equilibrium.\n",num2str(constant - val1 - val2));
+    fprintf("la regularized gap function ha valore %s. Quindi è un Nash equilibrium.\n",num2str(constant - val1 - val2));
 end
