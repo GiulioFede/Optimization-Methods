@@ -1,0 +1,113 @@
+
+%{
+
+    Questo script trova un Nash Equilibrium
+
+%}
+
+
+
+alfa = 1;
+number_of_attemps = 100;
+
+k=1;
+%per ogni starting point
+for i=1:number_of_attemps
+
+    %genero starting point i-esimo (NB: ricorda che ogni componente deve
+    %avere valore massimo di 1 e che la somma delle componenti deve fare 1)
+
+    x = [0; 0; 0];
+    %creo una permutazione randomica degli indici da cui iniziare
+    indexes = randperm(3);
+    x(indexes(1)) = rand(1,1);
+    x(indexes(2)) = (1 - x(indexes(1)))*rand(1,1);
+    x(indexes(3)) = (1 - x(indexes(1))- x(indexes(2)));
+    
+    y = [0; 0];
+    indexes = randperm(2);
+    y(indexes(1)) = rand(1,1);
+    y(indexes(2)) = (1 - y(indexes(1)));
+
+    w = [x; y];
+
+    %definisco i vincoli del problema
+    Aeq = [1 1 1 0 0;
+           0 0 0 1 1];
+    beq = [1;1];
+    lb = [0 0 0 0 0];
+    ub = [1 1 1 1 1];
+    [loc_min, val_loc_min] = fmincon(@(z) regularized_gap_function(z, alfa), w, [],[],Aeq,beq,lb,ub);
+    
+    if(val_loc_min<1e-3)
+        fprintf("Trovato Nash equilibria: %s , con valore %s\n", mat2str(loc_min), num2str(val_loc_min));
+        break;
+    end
+
+    fprintf("Iterazione %d",k);
+    k=k+1;
+
+end
+
+
+
+function v = regularized_gap_function(w,alfa)
+
+    x = w(1:3);
+    y = w(4:5);
+    
+    C1 = [3 3;
+          4 1;
+          6 0];
+    
+    C2 = [3 4;
+          4 0;
+          3 5];
+    
+    a = alfa;
+    
+    %{
+        la gap function è fatta dai seguenti termini:
+            x^T (C1+C2)y - a/2*|x|^2 - a/2*|y|^2 - min ( a/2|u|^2 + u*(C1y-ax))
+            - min (a/2|v| + v(C2x-ay))
+        
+        I primi 3 sono costanti, mentre gli altri due sono problemi quadratici da
+        risolvere rispetto u (il primo) e v (il secondo)
+        
+    %}
+    
+    constant = x'*(C1+C2)*y - a/2*norm(x)^2 -a/2*norm(y)^2;
+    
+    
+    %:::::::::::::::::: Primo problema quadratico :::::::::::::::::::::::::::::
+    
+    H = a*eye(3);
+    c = C1*y-a*x;
+    
+    % u1+u2+u3 = 1
+    Aeq = [1 1 1];
+    beq = [1];
+    
+    %ui>=0
+    lb = [0 0 0];
+    
+    [sol1,val1] = quadprog(H,c,[],[],Aeq,beq,lb,[]);
+    
+    
+    %:::::::::::::::::: Secondo problema quadratico :::::::::::::::::::::::::::::
+    
+    H = a*eye(2);
+    c = C2'*x-a*y;
+    
+    % v1+v2 = 1
+    Aeq = [1 1];
+    beq = [1];
+    
+    %ui>=0
+    lb = [0 0 0];
+    
+    [sol2,val2] = quadprog(H,c,[],[],Aeq,beq,lb,[]);
+    
+    v = constant - val1 - val2;
+    
+end
